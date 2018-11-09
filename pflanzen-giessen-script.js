@@ -31,7 +31,7 @@ const STATE_DATETIMESTART = STATE_PATH + 'datumZeitStartCounter';   // Date/Time
 const PLANTS_SCHEDULE = "1 * * * *"; // Jede Stunde
 
 // Logeinträge auf Debug setzen?
-const M_DEBUG = true;
+const M_DEBUG = false;
 
 // Voreingestellte Anzahl Tage, nach denen gegossen werden muss.
 // Kann jederzeit im State 'wieOftGiessen' geändert werden.
