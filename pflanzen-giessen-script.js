@@ -1,8 +1,9 @@
 /*******************************************************************************
  * ---------------------------
- * Script "Pflanzen gieﬂen"
+ * Script "Pflanzen gie√üen"
  * ---------------------------
  * Quelle: https://github.com/Mic-M/iobroker.pflanzen-giessen-script
+ * Support: https://forum.iobroker.net/viewtopic.php?f=21&t=18362
  * Version: 0.1 (Changelog: siehe https://github.com/Mic-M/iobroker.pflanzen-giessen-script)
   ******************************************************************************/
 
@@ -15,30 +16,30 @@
 const STATE_PATH = 'javascript.'+ instance + '.' + 'mic.PflanzenGiessen.';
 
 // Datenpunkte: Einzelne Datenpunkte
-const STATE_INTERVAL    =   STATE_PATH + 'wieOftGiessen';           // Number - Wie oft gieﬂen? Anzahl Tage
-const STATE_RESTART     =   STATE_PATH + 'reStartCounter';          // true (Button) - Neustart Z‰hler: Wir fangen neu an zu z‰hlen, wird bet‰tigt sobald die Pflanzen gegossen worden sind
-const STATE_DUE         =   STATE_PATH + 'faellig';                 // true/false.  Wenn "faellig", dann m¸ssen die Pflanzen gegossen werden. Wird false gesetzt, sobald Counter neu startet
-const STATE_DAYS_DUE    =   STATE_PATH + 'anzahlTageBereitsFaellig';// Number.  Anzahl Tage, seit dem die Pflanzen gegossen werden m¸ssten (aber es noch nicht sind)
-const STATE_DAYS_LEFT   =   STATE_PATH + 'anzahlTageBisFaellig';    // Number.  Anzahl Tage, bis die Pflanzen gegossen werden m¸ssen
+const STATE_INTERVAL    =   STATE_PATH + 'wieOftGiessen';           // Number - Wie oft gie√üen? Anzahl Tage
+const STATE_RESTART     =   STATE_PATH + 'reStartCounter';          // true (Button) - Neustart Z√§hler: Wir fangen neu an zu z√§hlen, wird bet√§tigt sobald die Pflanzen gegossen worden sind
+const STATE_DUE         =   STATE_PATH + 'faellig';                 // true/false.  Wenn "faellig", dann m√ºssen die Pflanzen gegossen werden. Wird false gesetzt, sobald Counter neu startet
+const STATE_DAYS_DUE    =   STATE_PATH + 'anzahlTageBereitsFaellig';// Number.  Anzahl Tage, seit dem die Pflanzen gegossen werden m√ºssten (aber es noch nicht sind)
+const STATE_DAYS_LEFT   =   STATE_PATH + 'anzahlTageBisFaellig';    // Number.  Anzahl Tage, bis die Pflanzen gegossen werden m√ºssen
 const STATE_DATETIMESTART = STATE_PATH + 'datumZeitStartCounter';   // Date/Time.  Wann wurde der Timer gestartet
 
 /*******************************************************************************
  * Konfiguration: Rest
  ******************************************************************************/
 
-// Wie oft ausf¸hren?
+// Wie oft ausf√ºhren?
 const PLANTS_SCHEDULE = "1 * * * *"; // Jede Stunde
 
-// Logeintr‰ge auf Debug setzen?
+// Logeintr√§ge auf Debug setzen?
 const M_DEBUG = true;
 
 // Voreingestellte Anzahl Tage, nach denen gegossen werden muss.
-// Kann jederzeit im State 'wieOftGiessen' ge‰ndert werden.
+// Kann jederzeit im State 'wieOftGiessen' ge√§ndert werden.
 const INTERVAL_PRESET = 7;
 
 
 /*******************************************************************************
- * Ab hier nichts mehr ‰ndern / Stop editing here!
+ * Ab hier nichts mehr √§ndern / Stop editing here!
  ******************************************************************************/
 
 
@@ -65,8 +66,8 @@ function main() {
 
     /***************************
      * Schedule beenden falls aktiv, dann starten.
-     * Dies machen wir, damit z.B. bei JavaScript-Adapter-Neustart immer sichergestellt ist, dass das Schedule l‰uft.
-     * Auﬂerdem initiales Start-Datum setzen, falls nicht vorhanden.
+     * Dies machen wir, damit z.B. bei JavaScript-Adapter-Neustart immer sichergestellt ist, dass das Schedule l√§uft.
+     * Au√üerdem initiales Start-Datum setzen, falls nicht vorhanden.
      **************************/
     clearSchedule(mSchedule);
 
@@ -75,22 +76,22 @@ function main() {
         mSchedule = schedule(PLANTS_SCHEDULE, doIfScheduleDue);
         if (M_DEBUG) log('Startdatum im State "' + STATE_DATETIMESTART + '" vorhanden, daher wurde Schedule neu gestartet.');
     } else {
-        // Initial ist noch kein Start-Datum gesetzt, also setzen wir eines mit Verzˆgerung
+        // Initial ist noch kein Start-Datum gesetzt, also setzen wir eines mit Verz√∂gerung
         setStateDelayed(STATE_RESTART, true, 3000);
         if (M_DEBUG) log('Startdatum im State "' + STATE_DATETIMESTART + '" leer, daher wird das Startdatum jetzt frisch gesetzt.');
     }
 
     /***************************
-     * ‹berwache State-Button reStartCounter
+     * √úberwache State-Button reStartCounter
      **************************/
     on({id: STATE_RESTART, val:true}, function (obj) {
         setState(STATE_DATETIMESTART, Date.now());
-        setTimeout(restartCounter(), 1000); // Damit das neue State-Datum auch gesetzt ist eine Sekunde Verzˆgerung
-        setStateDelayed(STATE_RESTART, false, 300); // wieder zur¸ck setzen.
+        setTimeout(restartCounter(), 1000); // Damit das neue State-Datum auch gesetzt ist eine Sekunde Verz√∂gerung
+        setStateDelayed(STATE_RESTART, false, 300); // wieder zur√ºck setzen.
     });
 
     /***************************
-     * ‹berwache State-Button wieOftGiessen, da diese Anzahl Tage vom User jederzeit ge‰ndert werden kˆnnen
+     * √úberwache State-Button wieOftGiessen, da diese Anzahl Tage vom User jederzeit ge√§ndert werden k√∂nnen
      **************************/
     on({id: STATE_INTERVAL, change:"ne"}, function (obj) {
         restartCounter();
@@ -98,7 +99,7 @@ function main() {
 
 
     /***************************
-     * F¸hren wir aus, sobald der Counter wieder starten soll
+     * F√ºhren wir aus, sobald der Counter wieder starten soll
      **************************/
     function restartCounter() {
 
@@ -106,20 +107,20 @@ function main() {
         setState(STATE_DAYS_DUE, 0);
         setState(STATE_DAYS_LEFT, getState(STATE_INTERVAL).val);
 
-        // Alten Schedule lˆschen
+        // Alten Schedule l√∂schen
         clearSchedule(mSchedule);
 
         // Neuen Schedule starten
         mSchedule = schedule(PLANTS_SCHEDULE, doIfScheduleDue);
 
-        if (M_DEBUG) log('Pflanzen Gieﬂen: Timer neu gestartet');
+        if (M_DEBUG) log('Pflanzen Gie√üen: Timer neu gestartet');
 
     }
 
 
 
     /***************************
-     * Sobald die Planzen gegossen werden m¸ssen, f¸hren wir folgendes aus
+     * Sobald die Planzen gegossen werden m√ºssen, f√ºhren wir folgendes aus
      **************************/
     function doIfScheduleDue() {
         var startTimeInState = new Date(getState(STATE_DATETIMESTART).val);
@@ -137,16 +138,16 @@ function main() {
         setState(STATE_DAYS_DUE, numberOfDaysDue);
         setState(STATE_DAYS_LEFT, numberOfDaysLeft);
         if ( dateTimeDue < Date.now() ) {
-            // Jetzt die Pflanzen gieﬂen
+            // Jetzt die Pflanzen gie√üen
             setState(STATE_DUE, true);
-            if (M_DEBUG) log('Pflanzen Gieﬂen: Schedule - Pflanzen gieﬂen f‰llig seit ' + numberOfDaysDue + ' Tagen');
+            if (M_DEBUG) log('Pflanzen Gie√üen: Schedule - Pflanzen gie√üen f√§llig seit ' + numberOfDaysDue + ' Tagen');
         } else {
-            // Pflanzen noch nicht gieﬂen
+            // Pflanzen noch nicht gie√üen
             setState(STATE_DUE, false);
-            if (M_DEBUG) log('Pflanzen Gieﬂen: Schedule - Pflanzen gieﬂen noch nicht f‰llig, erst in ' + numberOfDaysLeft + ' Tagen');
+            if (M_DEBUG) log('Pflanzen Gie√üen: Schedule - Pflanzen gie√üen noch nicht f√§llig, erst in ' + numberOfDaysLeft + ' Tagen');
         }
 
-        if (M_DEBUG) log('Pflanzen Gieﬂen: Pr¸fung durchgef¸ht, ob Pflanzen gegossen werden m¸ssen');
+        if (M_DEBUG) log('Pflanzen Gie√üen: Pr√ºfung durchgef√ºht, ob Pflanzen gegossen werden m√ºssen');
 
     }
 
@@ -155,7 +156,7 @@ function main() {
 }
 
 /*******************************************************************************
- * Weitere unterst¸tzende Funktionen usw.
+ * Weitere unterst√ºtzende Funktionen usw.
  *******************************************************************************/
 
 
@@ -170,8 +171,8 @@ function g_dateAddMinutes(date, minutes) {
 }
 
 /**
- * Pr¸ft ob Variableninhalt eine Zahl ist.
- * @param {any} Variable, die zu pr¸fen ist auf Zahl
+ * Pr√ºft ob Variableninhalt eine Zahl ist.
+ * @param {any} Variable, die zu pr√ºfen ist auf Zahl
  * @return true falls Zahl, false falls nicht.
  * isNumber ('123'); // true
  * isNumber ('123abc'); // false
@@ -191,11 +192,11 @@ function varIsNumber(n) {
  * Create states needed for this script
  */
 function createScriptStates() {
-    createState(STATE_INTERVAL, {'name':'Wie oft gieﬂen? Anzahl Tage', 'type':'number', 'unit':'d', 'min':1, 'max':60, 'read':true, 'write':true, 'role':'value', 'def':INTERVAL_PRESET });
-    createState(STATE_RESTART, {'name':'Z‰hler (neu) starten', 'type':'boolean', 'read':true, 'write':true, 'role':'button', 'def':false });
-    createState(STATE_DUE, {'name':'Pflanzen gieﬂen nˆtig?', 'type':'boolean', 'read':true, 'write':false, 'role':'state' });
-    createState(STATE_DAYS_DUE, {'name':'Anzahl Tage, seit dem die Pflanzen gegossen werden m¸ssen', 'type':'number', 'unit':'d', 'min':0, 'max':9999, 'read':true, 'write':false, 'role':'value', 'def':0 });
-    createState(STATE_DAYS_LEFT, {'name':'Anzahl Tage, bis die Pflanzen gegossen werden m¸ssen', 'type':'number', 'unit':'d', 'min':0, 'max':9999, 'read':true, 'write':false, 'role':'value', 'def':0 });
+    createState(STATE_INTERVAL, {'name':'Wie oft gie√üen? Anzahl Tage', 'type':'number', 'unit':'d', 'min':1, 'max':60, 'read':true, 'write':true, 'role':'value', 'def':INTERVAL_PRESET });
+    createState(STATE_RESTART, {'name':'Z√§hler (neu) starten', 'type':'boolean', 'read':true, 'write':true, 'role':'button', 'def':false });
+    createState(STATE_DUE, {'name':'Pflanzen gie√üen n√∂tig?', 'type':'boolean', 'read':true, 'write':false, 'role':'state' });
+    createState(STATE_DAYS_DUE, {'name':'Anzahl Tage, seit dem die Pflanzen gegossen werden m√ºssen', 'type':'number', 'unit':'d', 'min':0, 'max':9999, 'read':true, 'write':false, 'role':'value', 'def':0 });
+    createState(STATE_DAYS_LEFT, {'name':'Anzahl Tage, bis die Pflanzen gegossen werden m√ºssen', 'type':'number', 'unit':'d', 'min':0, 'max':9999, 'read':true, 'write':false, 'role':'value', 'def':0 });
     createState(STATE_DATETIMESTART, {'name':'Wann wurde der Timer gestartet', 'type':'number', 'read':true, 'write':false, 'role':'value.time'});
 }
 
